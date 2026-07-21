@@ -1,0 +1,421 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        80
+      ],
+      "id": "3a7c4d3a-e666-44db-92b0-d09996e60667",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "18AJlfFdor3LsKcgX3BX2zGjPdvZG9uU7",
+          "mode": "list",
+          "cachedResultName": "Rag2.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/18AJlfFdor3LsKcgX3BX2zGjPdvZG9uU7/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1392,
+        80
+      ],
+      "id": "70307b07-42e1-41f4-9cc6-c3f434ad725d",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nCa2xd2qLw0nJKwM",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1712,
+        80
+      ],
+      "id": "8063b4d9-fec2-49eb-b0a5-f8f27559e0bb",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "9lMNXh8g2aRDfCez",
+          "name": "test supabase"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2080,
+        400
+      ],
+      "id": "c5a2d4f9-1bf9-48db-946e-fe62cb9e0d1f",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "7dS4whAkyetGjZ2q",
+          "name": "staili officiel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1760,
+        336
+      ],
+      "id": "a7177a5b-0c82-4d80-a5ad-7c72b6d154cd",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "content": "# Knowledge Ingestion\n\nProcesses documents, extracts text, generates embeddings, and stores knowledge in Supabase Vector Store.",
+        "height": 560,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "521d4684-ed12-46b9-a6f9-b9b777baa23f",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=# task :\n\nYour task is to always use the connected Supabase Vector Store to answer user questions. Answer only from the retrieved documents. If no relevant information is found, reply: \"I couldn't find that information.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2528,
+        64
+      ],
+      "id": "cb148b15-6ac5-487b-a02a-9724e3b3011c",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2416,
+        256
+      ],
+      "id": "9fd8a983-fa4f-40be-8e19-61b6ce31bd9e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "7dS4whAkyetGjZ2q",
+          "name": "staili officiel"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        2560,
+        368
+      ],
+      "id": "bfc8812e-dbe0-445c-9b23-3c7b79ab9b1d",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "78JIUEhDvcoy9w6v",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "get the data frome documents",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        2688,
+        272
+      ],
+      "id": "f8dc8057-7756-48c8-96c3-24f4176e760e",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "9lMNXh8g2aRDfCez",
+          "name": "test supabase"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        80
+      ],
+      "id": "b0a0f164-87c8-4bfb-8394-2dba250b0ec8",
+      "name": "start"
+    },
+    {
+      "parameters": {
+        "content": "# RAG Assistant\n\nReceives Telegram messages, retrieves relevant context from Supabase Vector Store, and generates accurate AI responses.",
+        "height": 560,
+        "width": 816,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2240,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "c716cbcd-3793-405a-9218-c2437d794b52",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Embeddings\n\nConverts text into vector embeddings for semantic search.",
+        "height": 304,
+        "width": 208,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2016,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "002f1ab7-1bc7-4d25-9698-2c89d9cb9ac5",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2864,
+        64
+      ],
+      "id": "f057e1b7-8467-47ec-8988-db468fa69eae",
+      "name": "Send a text message",
+      "webhookId": "8e19522c-c511-4fd5-891a-83d9979523d8",
+      "credentials": {
+        "telegramApi": {
+          "id": "DwhBtqLhAgkIxd5Y",
+          "name": "n8n chat test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        2272,
+        64
+      ],
+      "id": "a72523b5-7e06-43e9-bfd1-2d0749d39dab",
+      "name": "Telegram Trigger",
+      "webhookId": "0722721a-8552-4bae-89b8-750cc4acfd18",
+      "credentials": {
+        "telegramApi": {
+          "id": "DwhBtqLhAgkIxd5Y",
+          "name": "n8n chat test"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a2113da8c9fbf220c7a2b80aecaf358170cc9ae5fdf76234bb770366d2379c3"
+  }
+}
