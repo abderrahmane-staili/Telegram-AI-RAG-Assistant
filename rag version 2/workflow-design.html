@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Workflow Design | only testing</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #090d16;
+      --panel: #111827;
+      --card: #151e2d;
+      --card-stroke: #344155;
+      --text: #edf3fb;
+      --muted: #9ba9bc;
+      --line: #8291a8;
+      --green: #28c781;
+      --yellow: #f5c84b;
+      --pink: #fb7185;
+      --orange: #fb923c;
+      --purple: #b18aff;
+      --blue: #60a5fa;
+      --teal: #2dd4bf;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 18% 0%, #142035 0, transparent 38rem),
+        var(--page);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    header {
+      max-width: 1960px;
+      margin: 0 auto;
+      padding: 34px 38px 24px;
+    }
+
+    .eyebrow {
+      margin: 0 0 9px;
+      color: #88a0bd;
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(25px, 3vw, 40px);
+      letter-spacing: -.04em;
+      line-height: 1.12;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: #aab7c9;
+      font-size: 14px;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 19px;
+    }
+
+    .summary span {
+      border: 1px solid #29364a;
+      border-radius: 999px;
+      background: #111a29;
+      color: #c8d3e2;
+      padding: 6px 11px;
+      font-size: 11px;
+      font-weight: 650;
+    }
+
+    .summary strong { color: #fff; }
+
+    main {
+      max-width: 1960px;
+      margin: 0 auto;
+      padding: 0 20px 30px;
+    }
+
+    .diagram-scroll {
+      overflow: auto;
+      border: 1px solid #273247;
+      border-radius: 18px;
+      background: #0b111c;
+      box-shadow: 0 24px 70px #0005;
+      scrollbar-color: #43516a #111827;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      min-width: 1640px;
+      height: auto;
+    }
+
+    .section-bg {
+      fill: #111827;
+      stroke: #29364a;
+      stroke-width: 1.4;
+    }
+
+    .section-rule { opacity: .72; }
+
+    .section-title {
+      fill: var(--section-color);
+      font-size: 15px;
+      font-weight: 780;
+      letter-spacing: .08em;
+    }
+
+    .section-count {
+      fill: #9eabc0;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .connection {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      marker-end: url(#arrow);
+      opacity: .83;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .connection.ai {
+      stroke: #c0a3ff;
+      stroke-dasharray: 7 7;
+      opacity: .95;
+    }
+
+    .connection-label-bg {
+      fill: #101827;
+      stroke: #66548f;
+      stroke-width: 1;
+    }
+
+    .connection-label {
+      fill: #d9caff;
+      font-size: 10px;
+      font-weight: 750;
+      letter-spacing: .03em;
+      text-anchor: middle;
+    }
+
+    .node-card .surface {
+      fill: var(--card);
+      stroke: var(--card-stroke);
+      stroke-width: 1.4;
+    }
+
+    .node-card .accent {
+      fill: var(--node-color);
+      opacity: .13;
+    }
+
+    .node-card .icon-well {
+      fill: #0d1522;
+      stroke: color-mix(in srgb, var(--node-color) 68%, #354157);
+      stroke-width: 1.2;
+    }
+
+    .node-name {
+      fill: #f2f6fc;
+      font-size: 13px;
+      font-weight: 720;
+      letter-spacing: -.01em;
+    }
+
+    .node-type {
+      fill: #96a6bc;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      font-size: 8.2px;
+      font-weight: 550;
+    }
+
+    .note-card .surface {
+      fill: color-mix(in srgb, var(--node-color) 13%, #111827);
+      stroke: color-mix(in srgb, var(--node-color) 72%, #253147);
+      stroke-dasharray: 5 3;
+    }
+
+    .note-card .node-name { fill: color-mix(in srgb, var(--node-color) 36%, #fff); }
+
+    .note-card .icon-well {
+      fill: color-mix(in srgb, var(--node-color) 16%, #101827);
+      stroke: color-mix(in srgb, var(--node-color) 55%, #354157);
+    }
+
+    .icon { color: var(--node-color); }
+    .icon-stroke { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-fill { fill: currentColor; }
+    .icon-muted { fill: #d4deec; opacity: .82; }
+    .node-card:hover .surface { stroke: color-mix(in srgb, var(--node-color) 80%, white); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 20px;
+      padding: 14px 18px;
+      color: #9eabc0;
+      font-size: 11px;
+    }
+
+    .legend-item { display: inline-flex; align-items: center; gap: 8px; }
+    .legend-line { width: 29px; border-top: 2px solid #8291a8; }
+    .legend-line.dashed { border-top: 2px dashed #c0a3ff; }
+
+    footer {
+      max-width: 1960px;
+      margin: 0 auto;
+      padding: 0 38px 26px;
+      color: #738198;
+      font-size: 11px;
+    }
+
+    @media (max-width: 700px) {
+      header { padding: 25px 20px 20px; }
+      main { padding: 0 10px 20px; }
+      footer { padding: 0 20px 22px; }
+      svg { min-width: 1500px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="eyebrow">n8n · Personal</p>
+    <h1>only testing</h1>
+    <p class="subtitle">Read-only workflow map · exact canvas names, node types, and connections.</p>
+    <div class="summary" aria-label="Workflow counts">
+      <span><strong id="node-total">25</strong> canvas items</span>
+      <span><strong>20</strong> workflow nodes</span>
+      <span><strong>5</strong> sticky notes</span>
+      <span><strong id="edge-total">19</strong> connections</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="diagram-scroll">
+      <svg id="workflow" viewBox="0 0 1960 1320" role="img" aria-labelledby="diagram-title diagram-desc" xmlns="http://www.w3.org/2000/svg">
+        <title id="diagram-title">only testing n8n workflow diagram</title>
+        <desc id="diagram-desc">Offline diagram of the existing workflow with 25 canvas items and 19 connections.</desc>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="#9ba9bc"/>
+          </marker>
+          <marker id="arrow-ai" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="#c0a3ff"/>
+          </marker>
+          <symbol id="icon-drive" viewBox="0 0 40 40">
+            <path d="M14 7h9l13 23h-9z" fill="#38bdf8"/>
+            <path d="M14 7h9L10 30H2z" fill="#34d399"/>
+            <path d="M2 30h34l-5 7H6z" fill="#fbbf24"/>
+          </symbol>
+          <symbol id="icon-telegram" viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="16" fill="#168bd2"/>
+            <path d="m9 19 21-8-5 19-7-6-4 4-1-7 12-8-15 6z" fill="#f5fbff"/>
+          </symbol>
+          <symbol id="icon-file" viewBox="0 0 40 40">
+            <path class="icon-stroke" d="M11 5h12l8 8v22H11z"/>
+            <path class="icon-stroke" d="M23 5v9h8M20 19v11m-5-5 5 5 5-5"/>
+          </symbol>
+          <symbol id="icon-extract" viewBox="0 0 40 40">
+            <path class="icon-stroke" d="M10 5h14l7 7v23H10zM24 5v8h7"/>
+            <path class="icon-stroke" d="M15 20h11M15 25h11M15 30h7"/>
+          </symbol>
+          <symbol id="icon-postgres" viewBox="0 0 40 40">
+            <ellipse cx="20" cy="10" rx="12" ry="5" class="icon-stroke"/>
+            <path class="icon-stroke" d="M8 10v19c0 3 5 6 12 6s12-3 12-6V10M8 19c0 3 5 5 12 5s12-2 12-5M8 28c0 3 5 5 12 5s12-2 12-5"/>
+          </symbol>
+          <symbol id="icon-embedding" viewBox="0 0 40 40">
+            <circle cx="11" cy="12" r="4" class="icon-fill"/>
+            <circle cx="29" cy="10" r="3" class="icon-fill"/>
+            <circle cx="20" cy="21" r="5" class="icon-fill"/>
+            <circle cx="10" cy="30" r="3" class="icon-fill"/>
+            <circle cx="30" cy="30" r="4" class="icon-fill"/>
+            <path class="icon-stroke" d="m14 14 3 4m8-6-3 5m-9 11 4-4m6 0 4 4"/>
+          </symbol>
+          <symbol id="icon-openai" viewBox="0 0 40 40">
+            <path class="icon-stroke" d="M20 7a7 7 0 0 1 12 5 7 7 0 0 1-1 12 7 7 0 0 1-7 10 7 7 0 0 1-8-5 7 7 0 0 1-11-6 7 7 0 0 1 2-11 7 7 0 0 1 13-5Z"/>
+            <path class="icon-stroke" d="m13 15 14 8m-14 2 14-8m-7-10v27"/>
+          </symbol>
+          <symbol id="icon-agent" viewBox="0 0 40 40">
+            <rect x="8" y="11" width="24" height="21" rx="6" class="icon-stroke"/>
+            <path class="icon-stroke" d="M20 5v6M14 21h.1M26 21h.1M15 27h10"/>
+            <circle cx="20" cy="5" r="2" class="icon-fill"/>
+          </symbol>
+          <symbol id="icon-switch" viewBox="0 0 40 40">
+            <circle cx="10" cy="20" r="3" class="icon-fill"/>
+            <circle cx="30" cy="10" r="3" class="icon-fill"/>
+            <circle cx="30" cy="20" r="3" class="icon-fill"/>
+            <circle cx="30" cy="30" r="3" class="icon-fill"/>
+            <path class="icon-stroke" d="M13 20h7c5 0 4-10 7-10m-14 10h14m-14 0h7c5 0 4 10 7 10"/>
+          </symbol>
+          <symbol id="icon-edit" viewBox="0 0 40 40">
+            <path class="icon-stroke" d="m8 28-2 7 7-2L32 14l-5-5zM24 12l5 5"/>
+            <path class="icon-stroke" d="M7 7h11M7 13h8"/>
+          </symbol>
+          <symbol id="icon-memory" viewBox="0 0 40 40">
+            <rect x="8" y="9" width="24" height="23" rx="4" class="icon-stroke"/>
+            <path class="icon-stroke" d="M14 15h12v11H14zM4 14h4m-4 7h4m-4 7h4m24-14h4m-4 7h4m-4 7h4"/>
+          </symbol>
+          <symbol id="icon-note" viewBox="0 0 40 40">
+            <path class="icon-stroke" d="M8 6h24v20l-8 8H8zM24 34v-8h8"/>
+            <path class="icon-stroke" d="M13 14h14M13 20h14"/>
+          </symbol>
+          <symbol id="icon-audio" viewBox="0 0 40 40">
+            <path class="icon-stroke" d="M5 21h4l3-9 5 18 5-23 5 22 4-13 3 5h3"/>
+          </symbol>
+        </defs>
+
+        <g aria-hidden="true">
+          <g class="section" style="--section-color:var(--green)">
+            <rect class="section-bg" x="35" y="30" width="1890" height="310" rx="18"/>
+            <path class="section-rule" d="M58 91H1902" stroke="var(--green)" stroke-width="2"/>
+            <text class="section-title" x="62" y="70">DOCUMENT INGESTION</text>
+            <text class="section-count" x="270" y="70">7 canvas items</text>
+          </g>
+          <g class="section" style="--section-color:var(--yellow)">
+            <rect class="section-bg" x="35" y="380" width="970" height="450" rx="18"/>
+            <path class="section-rule" d="M58 433H982" stroke="var(--yellow)" stroke-width="2"/>
+            <text class="section-title" x="62" y="412">INPUTS</text>
+            <text class="section-count" x="145" y="412">7 nodes</text>
+          </g>
+          <g class="section" style="--section-color:var(--pink)">
+            <rect class="section-bg" x="1025" y="380" width="445" height="450" rx="18"/>
+            <path class="section-rule" d="M1048 433H1447" stroke="var(--pink)" stroke-width="2"/>
+            <text class="section-title" x="1052" y="412">AI AGENT</text>
+            <text class="section-count" x="1165" y="412">2 canvas items</text>
+          </g>
+          <g class="section" style="--section-color:var(--teal)">
+            <rect class="section-bg" x="1490" y="380" width="435" height="450" rx="18"/>
+            <path class="section-rule" d="M1513 433H1902" stroke="var(--teal)" stroke-width="2"/>
+            <text class="section-title" x="1517" y="412">OUTPUT</text>
+            <text class="section-count" x="1600" y="412">1 node</text>
+          </g>
+          <g class="section" style="--section-color:var(--orange)">
+            <rect class="section-bg" x="35" y="890" width="600" height="390" rx="18"/>
+            <path class="section-rule" d="M58 943H612" stroke="var(--orange)" stroke-width="2"/>
+            <text class="section-title" x="62" y="922">MODELS</text>
+            <text class="section-count" x="150" y="922">3 canvas items</text>
+          </g>
+          <g class="section" style="--section-color:var(--purple)">
+            <rect class="section-bg" x="665" y="890" width="360" height="390" rx="18"/>
+            <path class="section-rule" d="M688 943H1002" stroke="var(--purple)" stroke-width="2"/>
+            <text class="section-title" x="692" y="922">MEMORY</text>
+            <text class="section-count" x="795" y="922">2 canvas items</text>
+          </g>
+          <g class="section" style="--section-color:var(--blue)">
+            <rect class="section-bg" x="1055" y="890" width="870" height="390" rx="18"/>
+            <path class="section-rule" d="M1078 943H1902" stroke="var(--blue)" stroke-width="2"/>
+            <text class="section-title" x="1082" y="922">VECTOR DATABASE</text>
+            <text class="section-count" x="1270" y="922">3 canvas items</text>
+          </g>
+        </g>
+
+        <g id="connections" aria-label="Workflow connections">
+          <path class="connection" data-from="Google Drive Trigger" data-to="Download file" data-type="main" d="M290 192H330"><title>Google Drive Trigger → Download file · main</title></path>
+          <path class="connection" data-from="Download file" data-to="Extract from File" data-type="main" d="M550 192H590"><title>Download file → Extract from File · main</title></path>
+          <path class="connection" data-from="Extract from File" data-to="Postgres PGVector Store1" data-type="main" d="M810 192H850V112H1400V192H1430"><title>Extract from File → Postgres PGVector Store1 · main</title></path>
+          <path class="connection ai" data-from="Embedding" data-to="Postgres PGVector Store1" data-type="ai_document" marker-end="url(#arrow-ai)" d="M1090 266H1410V235H1430"><title>Embedding → Postgres PGVector Store1 · ai_document · document</title></path>
+          <g aria-hidden="true"><rect class="connection-label-bg" x="1190" y="250" width="69" height="19" rx="8"/><text class="connection-label" x="1224" y="263">document</text></g>
+          <path class="connection ai" data-from="Embeddings Model" data-to="Postgres PGVector Store1" data-type="ai_embedding" marker-end="url(#arrow-ai)" d="M1350 266H1380V190H1430"><title>Embeddings Model → Postgres PGVector Store1 · ai_embedding · embedding</title></path>
+          <g aria-hidden="true"><rect class="connection-label-bg" x="1362" y="206" width="67" height="19" rx="8"/><text class="connection-label" x="1395" y="219">embedding</text></g>
+
+          <path class="connection" data-from="gite a message" data-to="&gt;!&lt;" data-type="main" d="M290 606H350"><title>gite a message → &gt;!&lt; · main</title></path>
+          <path class="connection" data-from="&gt;!&lt;" data-to="Edit Fields" data-type="main" d="M570 585H590V476H620"><title>&gt;!&lt; → Edit Fields · main</title></path>
+          <path class="connection" data-from="&gt;!&lt;" data-to="Get a file" data-type="main" d="M570 606H620"><title>&gt;!&lt; → Get a file · main</title></path>
+          <path class="connection" data-from="&gt;!&lt;" data-to="for images" data-type="main" d="M570 627H590V736H620"><title>&gt;!&lt; → for images · main</title></path>
+          <path class="connection" data-from="Get a file" data-to="Voice" data-type="main" d="M840 606H850V556H855"><title>Get a file → Voice · main</title></path>
+          <path class="connection" data-from="for images" data-to="Analyze image" data-type="main" d="M840 736H850V726H855"><title>for images → Analyze image · main</title></path>
+          <path class="connection" data-from="Edit Fields" data-to="AI Agent" data-type="main" d="M840 476C975 476 1030 575 1190 575"><title>Edit Fields → AI Agent · main</title></path>
+          <path class="connection" data-from="Voice" data-to="AI Agent" data-type="main" d="M1075 556C1115 556 1140 610 1190 610"><title>Voice → AI Agent · main</title></path>
+          <path class="connection" data-from="Analyze image" data-to="AI Agent" data-type="main" d="M1075 726C1120 726 1140 650 1190 650"><title>Analyze image → AI Agent · main</title></path>
+          <path class="connection" data-from="AI Agent" data-to="Send a text message" data-type="main" d="M1410 606H1580"><title>AI Agent → Send a text message · main</title></path>
+
+          <path class="connection ai" data-from="Model1" data-to="AI Agent" data-type="ai_languageModel" marker-end="url(#arrow-ai)" d="M195 1149V1210H1370V535H1260V560"><title>Model1 → AI Agent · ai_languageModel · model</title></path>
+          <g aria-hidden="true"><rect class="connection-label-bg" x="938" y="1197" width="49" height="19" rx="8"/><text class="connection-label" x="962" y="1210">model</text></g>
+          <path class="connection ai" data-from="Model2" data-to="AI Agent" data-type="ai_languageModel" marker-end="url(#arrow-ai)" d="M460 1149V1245H1480V530H1360V560"><title>Model2 → AI Agent · ai_languageModel · model</title></path>
+          <g aria-hidden="true"><rect class="connection-label-bg" x="1007" y="1232" width="49" height="19" rx="8"/><text class="connection-label" x="1031" y="1245">model</text></g>
+          <path class="connection ai" data-from="Postgres PGVector Store" data-to="AI Agent" data-type="ai_tool" marker-end="url(#arrow-ai)" d="M1110 1077H1010V680H1160V640H1190"><title>Postgres PGVector Store → AI Agent · ai_tool · tool</title></path>
+          <g aria-hidden="true"><rect class="connection-label-bg" x="1000" y="880" width="40" height="19" rx="8"/><text class="connection-label" x="1020" y="893">tool</text></g>
+          <path class="connection ai" data-from="Embeddings OpenAI" data-to="Postgres PGVector Store" data-type="ai_embedding" marker-end="url(#arrow-ai)" d="M1420 1077H1330"><title>Embeddings OpenAI → Postgres PGVector Store · ai_embedding · embedding</title></path>
+          <g aria-hidden="true"><rect class="connection-label-bg" x="1341" y="1064" width="67" height="19" rx="8"/><text class="connection-label" x="1374" y="1077">embedding</text></g>
+        </g>
+
+        <g id="nodes" aria-label="Workflow nodes and sticky notes">
+          <g class="node-card" data-node="1" data-name="Google Drive Trigger" data-type="n8n-nodes-base.googleDriveTrigger" style="--node-color:var(--green)" transform="translate(70 145)">
+            <title>Google Drive Trigger · n8n-nodes-base.googleDriveTrigger</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-drive" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Google Drive Trigger</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.googleDriveTrigger</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Download file" data-type="n8n-nodes-base.googleDrive" style="--node-color:var(--green)" transform="translate(330 145)">
+            <title>Download file · n8n-nodes-base.googleDrive</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-drive" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Download file</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.googleDrive</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Extract from File" data-type="n8n-nodes-base.extractFromFile" style="--node-color:var(--green)" transform="translate(590 145)">
+            <title>Extract from File · n8n-nodes-base.extractFromFile</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-extract" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Extract from File</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.extractFromFile</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Embedding" data-type="@n8n/n8n-nodes-langchain.documentDefaultDataLoader" style="--node-color:var(--green)" transform="translate(870 220)">
+            <title>Embedding · @n8n/n8n-nodes-langchain.documentDefaultDataLoader</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-file" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Embedding</text>
+            <text class="node-type" x="14" y="75">
+              <tspan x="14">@n8n/n8n-nodes-langchain.</tspan><tspan x="14" dy="10">documentDefaultDataLoader</tspan>
+            </text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Embeddings Model" data-type="@n8n/n8n-nodes-langchain.embeddingsOpenAi" style="--node-color:var(--green)" transform="translate(1130 220)">
+            <title>Embeddings Model · @n8n/n8n-nodes-langchain.embeddingsOpenAi</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-embedding" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Embeddings Model</text>
+            <text class="node-type" x="14" y="75">
+              <tspan x="14">@n8n/n8n-nodes-langchain.</tspan><tspan x="14" dy="10">embeddingsOpenAi</tspan>
+            </text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Postgres PGVector Store1" data-type="@n8n/n8n-nodes-langchain.vectorStorePGVector" style="--node-color:var(--green)" transform="translate(1430 145)">
+            <title>Postgres PGVector Store1 · @n8n/n8n-nodes-langchain.vectorStorePGVector</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-postgres" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Postgres PGVector Store1</text>
+            <text class="node-type" x="14" y="75">
+              <tspan x="14">@n8n/n8n-nodes-langchain.</tspan><tspan x="14" dy="10">vectorStorePGVector</tspan>
+            </text>
+          </g>
+          <g class="node-card note-card" data-node="1" data-name="DOCUMENT INGESTION" data-type="n8n-nodes-base.stickyNote" style="--node-color:var(--green)" transform="translate(1680 210)">
+            <title>DOCUMENT INGESTION · n8n-nodes-base.stickyNote</title>
+            <rect class="surface" width="220" height="94" rx="13"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-note" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">DOCUMENT INGESTION</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.stickyNote</text>
+          </g>
+
+          <g class="node-card" data-node="1" data-name="gite a message" data-type="n8n-nodes-base.telegramTrigger" style="--node-color:var(--yellow)" transform="translate(70 560)">
+            <title>gite a message · n8n-nodes-base.telegramTrigger</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-telegram" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">gite a message</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.telegramTrigger</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="&gt;!&lt;" data-type="n8n-nodes-base.switch" style="--node-color:var(--yellow)" transform="translate(350 560)">
+            <title>&gt;!&lt; · n8n-nodes-base.switch</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-switch" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">&gt;!&lt;</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.switch</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Edit Fields" data-type="n8n-nodes-base.set" style="--node-color:var(--yellow)" transform="translate(620 430)">
+            <title>Edit Fields · n8n-nodes-base.set</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-edit" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Edit Fields</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.set</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Get a file" data-type="n8n-nodes-base.telegram" style="--node-color:var(--yellow)" transform="translate(620 560)">
+            <title>Get a file · n8n-nodes-base.telegram</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-telegram" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Get a file</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.telegram</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="for images" data-type="n8n-nodes-base.telegram" style="--node-color:var(--yellow)" transform="translate(620 690)">
+            <title>for images · n8n-nodes-base.telegram</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-telegram" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">for images</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.telegram</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Voice" data-type="@n8n/n8n-nodes-langchain.openAi" style="--node-color:var(--yellow)" transform="translate(855 510)">
+            <title>Voice · @n8n/n8n-nodes-langchain.openAi</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-audio" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Voice</text>
+            <text class="node-type" x="14" y="79">@n8n/n8n-nodes-langchain.openAi</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Analyze image" data-type="@n8n/n8n-nodes-langchain.openAi" style="--node-color:var(--yellow)" transform="translate(855 680)">
+            <title>Analyze image · @n8n/n8n-nodes-langchain.openAi</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-openai" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Analyze image</text>
+            <text class="node-type" x="14" y="79">@n8n/n8n-nodes-langchain.openAi</text>
+          </g>
+
+          <g class="node-card note-card" data-node="1" data-name="Ai Agent Learning" data-type="n8n-nodes-base.stickyNote" style="--node-color:var(--pink)" transform="translate(1240 435)">
+            <title>Ai Agent Learning · n8n-nodes-base.stickyNote</title>
+            <rect class="surface" width="220" height="94" rx="13"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-note" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Ai Agent Learning</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.stickyNote</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="AI Agent" data-type="@n8n/n8n-nodes-langchain.agent" style="--node-color:var(--pink)" transform="translate(1190 560)">
+            <title>AI Agent · @n8n/n8n-nodes-langchain.agent</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-agent" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">AI Agent</text>
+            <text class="node-type" x="14" y="79">@n8n/n8n-nodes-langchain.agent</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Send a text message" data-type="n8n-nodes-base.telegram" style="--node-color:var(--teal)" transform="translate(1580 560)">
+            <title>Send a text message · n8n-nodes-base.telegram</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-telegram" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Send a text message</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.telegram</text>
+          </g>
+
+          <g class="node-card note-card" data-node="1" data-name="MODELS" data-type="n8n-nodes-base.stickyNote" style="--node-color:var(--orange)" transform="translate(65 945)">
+            <title>MODELS · n8n-nodes-base.stickyNote</title>
+            <rect class="surface" width="220" height="94" rx="13"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-note" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">MODELS</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.stickyNote</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Model1" data-type="@n8n/n8n-nodes-langchain.lmChatOpenAi" style="--node-color:var(--orange)" transform="translate(85 1055)">
+            <title>Model1 · @n8n/n8n-nodes-langchain.lmChatOpenAi</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-openai" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Model1</text>
+            <text class="node-type" x="14" y="75">
+              <tspan x="14">@n8n/n8n-nodes-langchain.</tspan><tspan x="14" dy="10">lmChatOpenAi</tspan>
+            </text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Model2" data-type="@n8n/n8n-nodes-langchain.lmChatOpenAi" style="--node-color:var(--orange)" transform="translate(350 1055)">
+            <title>Model2 · @n8n/n8n-nodes-langchain.lmChatOpenAi</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-openai" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Model2</text>
+            <text class="node-type" x="14" y="75">
+              <tspan x="14">@n8n/n8n-nodes-langchain.</tspan><tspan x="14" dy="10">lmChatOpenAi</tspan>
+            </text>
+          </g>
+
+          <g class="node-card note-card" data-node="1" data-name="MEMORY" data-type="n8n-nodes-base.stickyNote" style="--node-color:var(--purple)" transform="translate(690 950)">
+            <title>MEMORY · n8n-nodes-base.stickyNote</title>
+            <rect class="surface" width="220" height="94" rx="13"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-note" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">MEMORY</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.stickyNote</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Memory" data-type="@n8n/n8n-nodes-langchain.memoryBufferWindow" style="--node-color:var(--purple)" transform="translate(735 1050)">
+            <title>Memory · @n8n/n8n-nodes-langchain.memoryBufferWindow</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-memory" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Memory</text>
+            <text class="node-type" x="14" y="75">
+              <tspan x="14">@n8n/n8n-nodes-langchain.</tspan><tspan x="14" dy="10">memoryBufferWindow</tspan>
+            </text>
+          </g>
+
+          <g class="node-card note-card" data-node="1" data-name="VECTOR DATABASE" data-type="n8n-nodes-base.stickyNote" style="--node-color:var(--blue)" transform="translate(1670 950)">
+            <title>VECTOR DATABASE · n8n-nodes-base.stickyNote</title>
+            <rect class="surface" width="220" height="94" rx="13"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-note" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">VECTOR DATABASE</text>
+            <text class="node-type" x="14" y="79">n8n-nodes-base.stickyNote</text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Postgres PGVector Store" data-type="@n8n/n8n-nodes-langchain.vectorStorePGVector" style="--node-color:var(--blue)" transform="translate(1110 1030)">
+            <title>Postgres PGVector Store · @n8n/n8n-nodes-langchain.vectorStorePGVector</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-postgres" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Postgres PGVector Store</text>
+            <text class="node-type" x="14" y="75">
+              <tspan x="14">@n8n/n8n-nodes-langchain.</tspan><tspan x="14" dy="10">vectorStorePGVector</tspan>
+            </text>
+          </g>
+          <g class="node-card" data-node="1" data-name="Embeddings OpenAI" data-type="@n8n/n8n-nodes-langchain.embeddingsOpenAi" style="--node-color:var(--blue)" transform="translate(1420 1030)">
+            <title>Embeddings OpenAI · @n8n/n8n-nodes-langchain.embeddingsOpenAi</title>
+            <rect class="surface" width="220" height="94" rx="13"/><rect class="accent" width="4" height="94" rx="2"/>
+            <rect class="icon-well" x="12" y="17" width="40" height="40" rx="11"/>
+            <use href="#icon-embedding" x="19" y="24" width="26" height="26" class="icon"/>
+            <text class="node-name" x="64" y="39">Embeddings OpenAI</text>
+            <text class="node-type" x="14" y="75">
+              <tspan x="14">@n8n/n8n-nodes-langchain.</tspan><tspan x="14" dy="10">embeddingsOpenAi</tspan>
+            </text>
+          </g>
+        </g>
+      </svg>
+      <div class="legend" aria-label="Connection legend">
+        <span class="legend-item"><span class="legend-line"></span> Main workflow connection</span>
+        <span class="legend-item"><span class="legend-line dashed"></span> AI connection (model, tool, embedding, document)</span>
+        <span class="legend-item">Canvas notes are included as sticky-note cards; note body text is omitted.</span>
+      </div>
+    </div>
+  </main>
+  <footer>Standalone HTML · inline CSS and SVG · no external assets, scripts, credentials, or workflow controls.</footer>
+</body>
+</html>
