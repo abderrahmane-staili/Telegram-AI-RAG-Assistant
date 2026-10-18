@@ -1,0 +1,935 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json['0'].content[0].text }}\n{{ $json.message.text }}\n{{ $json.text }}",
+        "needsFallback": true,
+        "options": {
+          "systemMessage": "=# task :\n\nYour task is to always use the connected Supabase Vector Store to answer user questions. Answer only from the retrieved documents. If no relevant information is found, reply: \"I couldn't find that information.\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2912,
+        368
+      ],
+      "id": "5b07d857-1caf-4b87-8c8e-11ff3311a368",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2848,
+        768
+      ],
+      "id": "b662c290-edb9-4dc0-9fb4-15753fd6fa7a",
+      "name": "Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "pPUmz9DqVW1Cainf",
+          "name": "ABDERRAHMANE--OFFIC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2752,
+        768
+      ],
+      "id": "8933f8ce-902c-4785-9a08-2efadb3db242",
+      "name": "Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "pPUmz9DqVW1Cainf",
+          "name": "ABDERRAHMANE--OFFIC"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        3008,
+        752
+      ],
+      "id": "ed50b78e-fdb9-48bc-adc4-5b83aae5fd54",
+      "name": "Memory"
+    },
+    {
+      "parameters": {
+        "content": "\n\n# Ai Agent Learning ",
+        "height": 960,
+        "width": 2036,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1728,
+        208
+      ],
+      "id": "117f4066-7b98-4980-939e-22332b7c7a7c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "get the data frome documents",
+        "tableName": "documents",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        3360,
+        704
+      ],
+      "id": "32e9b41c-e1b6-4e1f-83e9-7e3bf21fd62f",
+      "name": "Postgres PGVector Store",
+      "credentials": {
+        "postgres": {
+          "id": "8LB2yJOaHaehlFyx",
+          "name": "rag-system"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": "=documents",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePGVector",
+      "typeVersion": 1.3,
+      "position": [
+        2912,
+        -160
+      ],
+      "id": "43fc38ab-c461-45f3-adbc-410a1fccbdd5",
+      "name": "Postgres PGVector Store1",
+      "credentials": {
+        "postgres": {
+          "id": "8LB2yJOaHaehlFyx",
+          "name": "rag-system"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFile",
+        "fileToWatch": {
+          "__rl": true,
+          "value": "19YTQYsD9IhMguDQsXPUiRaMpA__Rx4E1",
+          "mode": "list",
+          "cachedResultName": "test_rag.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/19YTQYsD9IhMguDQsXPUiRaMpA__Rx4E1/view?usp=drivesdk"
+        }
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        -160
+      ],
+      "id": "9f0813c2-800d-4e99-bc05-35cf96a531dd",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nTR6XwE7sA2PgbjU",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.4-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-5.4-MINI"
+        },
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        2544,
+        368
+      ],
+      "id": "89b122dc-51a3-426a-a5b1-04915ef1a05c",
+      "name": "Analyze image",
+      "credentials": {
+        "openAiApi": {
+          "id": "pPUmz9DqVW1Cainf",
+          "name": "ABDERRAHMANE--OFFIC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.document?.file_id ?? $json.message.photo?.[$json.message.photo.length - 1]?.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2320,
+        368
+      ],
+      "id": "50a3c4cc-b521-480c-b6c1-92c18648d0d6",
+      "name": "for images",
+      "webhookId": "2bca3cb8-45e0-4637-bc62-96f24b22d336",
+      "credentials": {
+        "telegramApi": {
+          "id": "IKUsXgRbJkmjuyVF",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        1808,
+        528
+      ],
+      "id": "87befabd-fb8c-473c-b835-45fb0f74597d",
+      "name": "gite a message",
+      "webhookId": "6f497aec-f604-4701-8dfd-5d2d285c0d17",
+      "credentials": {
+        "telegramApi": {
+          "id": "IKUsXgRbJkmjuyVF",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "d0efcb45-d2cc-49e3-8498-162aefdf1d7e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b0ec2ad2-08ef-4e05-9f4a-c59a71621371",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c4373cb6-1bef-42fb-b2a0-18ccca3a7d44",
+                    "leftValue": "={{ $json.message.photo[2] }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2000,
+        512
+      ],
+      "id": "962b91ab-ab03-4bfe-b7f2-d4c1a22397a1",
+      "name": ">!<"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2320,
+        528
+      ],
+      "id": "8211d8b4-1792-48ff-adcc-15a9384380ad",
+      "name": "Get a file",
+      "webhookId": "835c449d-4dc5-4ecf-b147-b1487d005db9",
+      "credentials": {
+        "telegramApi": {
+          "id": "IKUsXgRbJkmjuyVF",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        2544,
+        528
+      ],
+      "id": "33ec1966-1ee5-4ee6-b878-d603cc8c9899",
+      "name": "Voice",
+      "credentials": {
+        "openAiApi": {
+          "id": "pPUmz9DqVW1Cainf",
+          "name": "ABDERRAHMANE--OFFIC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5e3b45c9-31a3-491a-8df3-a25efd53d28d",
+              "name": "message",
+              "value": "={{ $json.message.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        2416,
+        704
+      ],
+      "id": "7c8fe043-4766-4ebf-b28c-acbf270d993e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        2656,
+        48
+      ],
+      "id": "74e9c025-5ae6-406d-bfeb-d0b506b08fe9",
+      "name": "Embedding"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        2784,
+        48
+      ],
+      "id": "c309cb7a-61fa-4602-bcce-7d21677e0765",
+      "name": "Embeddings Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "pPUmz9DqVW1Cainf",
+          "name": "ABDERRAHMANE--OFFIC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "height": 352,
+        "width": 832
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        -192
+      ],
+      "id": "8e7e25a3-190f-4f07-a577-71241bcb0146",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# MODELS",
+        "height": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2720,
+        704
+      ],
+      "id": "e03c9fa0-ba4e-4a08-8683-0d29813abfb0",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# MEMORY\n",
+        "height": 176,
+        "width": 150,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2976,
+        704
+      ],
+      "id": "b803f9da-50ca-4f45-b5f7-3c991d74efc7",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3296,
+        848
+      ],
+      "id": "49f72f4b-4b53-4d5b-b8f6-9c3785f2ef6b",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "pPUmz9DqVW1Cainf",
+          "name": "ABDERRAHMANE--OFFIC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# VECTOR DATABASE ",
+        "height": 352,
+        "width": 416,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3216,
+        624
+      ],
+      "id": "e790ce0d-497e-4649-9cbe-2c375be25f19",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        2752,
+        -160
+      ],
+      "id": "9b12d655-c616-4e58-9598-c6e0fd1ce090",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "19YTQYsD9IhMguDQsXPUiRaMpA__Rx4E1",
+          "mode": "list",
+          "cachedResultName": "test_rag.pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/19YTQYsD9IhMguDQsXPUiRaMpA__Rx4E1/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2592,
+        -160
+      ],
+      "id": "29ddc92e-ef2e-4161-87aa-0f80220f95a9",
+      "name": "Download file1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nTR6XwE7sA2PgbjU",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('gite a message').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "disable_notification": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3392,
+        304
+      ],
+      "id": "77d3fb9d-0347-4f92-ac8e-f555e9162c5a",
+      "name": "Send a text message1",
+      "webhookId": "f2acf947-9fc0-4b0b-968b-30ab4edefcf9",
+      "credentials": {
+        "telegramApi": {
+          "id": "IKUsXgRbJkmjuyVF",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres PGVector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "for images": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "gite a message": {
+      "main": [
+        [
+          {
+            "node": ">!<",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    ">!<": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "for images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voice": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding": {
+      "ai_document": [
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Model": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Postgres PGVector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Postgres PGVector Store1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Google Drive Trigger": [
+      {
+        "kind": "drive#file",
+        "fileExtension": "pdf",
+        "copyRequiresWriterPermission": false,
+        "md5Checksum": "6cfaec88a8df96a5a4fdd2f67a757295",
+        "writersCanShare": true,
+        "viewedByMe": true,
+        "mimeType": "application/pdf",
+        "parents": [
+          "0ADCx8ef0Jp3tUk9PVA"
+        ],
+        "thumbnailLink": "https://lh3.googleusercontent.com/drive-storage/AJQWtBPo89U6E_ezQmo748mviTmmYPWNYCO7Jz4XJBQ4EhgG_Buz6R1QbEciFMtWoHi0YvRmyMBUNnn0Q8RhT4vkTplZ3Ic0qCkKEBkhWlkcMtS_9ug9PA=s220",
+        "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+        "shared": false,
+        "lastModifyingUser": {
+          "displayName": "Abderrahman Staili",
+          "kind": "drive#user",
+          "me": true,
+          "permissionId": "11683512432631502200",
+          "emailAddress": "abderrahman.staili.oficiel@gmail.com",
+          "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocI8WPFructFjzj1EDj_FRsPY-sUmjkz7tWTmu3PBtMYlCNDFEyt=s64"
+        },
+        "owners": [
+          {
+            "displayName": "Abderrahman Staili",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "11683512432631502200",
+            "emailAddress": "abderrahman.staili.oficiel@gmail.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocI8WPFructFjzj1EDj_FRsPY-sUmjkz7tWTmu3PBtMYlCNDFEyt=s64"
+          }
+        ],
+        "headRevisionId": "0BzCx8ef0Jp3tQ2FyYnJiYU4vck1WT0Q1Z1BGRTRBTHRZR0hvPQ",
+        "webViewLink": "https://drive.google.com/file/d/19YTQYsD9IhMguDQsXPUiRaMpA__Rx4E1/view?usp=drivesdk",
+        "webContentLink": "https://drive.google.com/uc?id=19YTQYsD9IhMguDQsXPUiRaMpA__Rx4E1&export=download",
+        "size": "2678",
+        "viewersCanCopyContent": true,
+        "permissions": [
+          {
+            "id": "11683512432631502200",
+            "displayName": "Abderrahman Staili",
+            "type": "user",
+            "kind": "drive#permission",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocI8WPFructFjzj1EDj_FRsPY-sUmjkz7tWTmu3PBtMYlCNDFEyt=s64",
+            "emailAddress": "abderrahman.staili.oficiel@gmail.com",
+            "role": "owner",
+            "deleted": false,
+            "pendingOwner": false
+          }
+        ],
+        "hasThumbnail": true,
+        "spaces": [
+          "drive"
+        ],
+        "id": "19YTQYsD9IhMguDQsXPUiRaMpA__Rx4E1",
+        "name": "test_rag.pdf",
+        "starred": false,
+        "trashed": false,
+        "explicitlyTrashed": false,
+        "createdTime": "2026-10-18T15:38:34.743Z",
+        "modifiedTime": "2026-10-18T15:38:52.971Z",
+        "modifiedByMeTime": "2026-10-18T15:38:52.971Z",
+        "viewedByMeTime": "2026-10-18T15:38:52.971Z",
+        "quotaBytesUsed": "5356",
+        "version": "6",
+        "originalFilename": "test_rag.pdf",
+        "ownedByMe": true,
+        "fullFileExtension": "pdf",
+        "isAppAuthorized": false,
+        "capabilities": {
+          "canChangeViewersCanCopyContent": true,
+          "canEdit": true,
+          "canCopy": true,
+          "canComment": true,
+          "canAddChildren": false,
+          "canDelete": true,
+          "canDownload": true,
+          "canListChildren": false,
+          "canRemoveChildren": false,
+          "canRename": true,
+          "canTrash": true,
+          "canReadRevisions": true,
+          "canChangeCopyRequiresWriterPermission": true,
+          "canMoveItemIntoTeamDrive": true,
+          "canUntrash": true,
+          "canModifyContent": true,
+          "canMoveItemOutOfDrive": true,
+          "canAddMyDriveParent": false,
+          "canRemoveMyDriveParent": true,
+          "canMoveItemWithinDrive": true,
+          "canShare": true,
+          "canMoveChildrenWithinDrive": false,
+          "canModifyContentRestriction": true,
+          "canChangeSecurityUpdateEnabled": false,
+          "canAcceptOwnership": false,
+          "canReadLabels": false,
+          "canModifyLabels": false,
+          "canModifyEditorContentRestriction": true,
+          "canModifyOwnerContentRestriction": true,
+          "canRemoveContentRestriction": false,
+          "canDisableInheritedPermissions": false,
+          "canEnableInheritedPermissions": true,
+          "canChangeItemDownloadRestriction": true,
+          "canStartApproval": false,
+          "canAccessViaGenAi": true
+        },
+        "thumbnailVersion": "3",
+        "modifiedByMe": true,
+        "permissionIds": [
+          "11683512432631502200"
+        ],
+        "linkShareMetadata": {
+          "securityUpdateEligible": false,
+          "securityUpdateEnabled": true
+        },
+        "sha1Checksum": "27a1ddb1f954b348331b75c357b9adab59cbf2f6",
+        "sha256Checksum": "13ff4fe73e78a83bb726242cb292677fe92c3a4e252af80f2c014d3b2bcf3ab3",
+        "inheritedPermissionsDisabled": false,
+        "downloadRestrictions": {
+          "itemDownloadRestriction": {
+            "restrictedForReaders": false,
+            "restrictedForWriters": false
+          },
+          "effectiveDownloadRestrictionWithContext": {
+            "restrictedForReaders": false,
+            "restrictedForWriters": false
+          }
+        },
+        "clientEncryptionDetails": {
+          "decryptionMetadata": {
+            "wrappedKey": "",
+            "kaclsId": "0",
+            "aes256GcmChunkSize": "unset",
+            "keyFormat": "unsetKeyFormat",
+            "encryptionResourceKeyHash": ""
+          }
+        }
+      }
+    ]
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "500acbc15071f27dd48d1ec68955f9a2da0e93e5405945678b09708cd048df90"
+  }
+}
